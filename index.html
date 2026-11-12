@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Copiar mensaje · Canal de WhatsApp Coally</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#111C4E;--orange:#FF6B00;--light:#F4F3F2;--text:#2B2F3A}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--light);font-family:'Poppins',Helvetica,Arial,sans-serif;color:var(--text)}
+  .w{max-width:620px;margin:0 auto;padding:20px 16px}
+  .c{background:#fff;border-radius:16px;overflow:hidden}
+  .h{padding:18px 22px;border-bottom:4px solid var(--orange)}
+  .h img{display:block;width:120px;height:auto}
+  .b{padding:20px 22px}
+  .tag{margin:0 0 12px;font-weight:700;color:var(--navy)}
+  pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-family:inherit;font-size:15px;line-height:1.55;background:var(--light);border-radius:10px;padding:16px;margin:0 0 16px}
+  button,.sec{display:inline-block;border:0;border-radius:999px;padding:12px 24px;font:600 15px 'Poppins',Helvetica,Arial,sans-serif;cursor:pointer;text-decoration:none;margin:0 8px 8px 0}
+  button{background:var(--orange);color:#fff}
+  .sec{background:var(--navy);color:#fff}
+  .ok{color:#127a43;font-weight:600;min-height:1.2em;margin:4px 0 0}
+</style>
+</head>
+<body>
+<div class="w"><div class="c">
+  <div class="h"><img src="https://coally-images.s3.amazonaws.com/logo-coally-n.png" alt="Coally"></div>
+  <div class="b" id="cuerpo">
+    <p class="tag" id="tag"></p>
+    <pre id="t"></pre>
+    <button id="b" type="button">Copiar mensaje</button>
+    <a class="sec" href="https://whatsapp.com/channel/0029VbE72NlLtOjBVlO0e03d" target="_blank" rel="noopener">Abrir el Canal</a>
+    <p id="ok" class="ok"></p>
+  </div>
+</div></div>
+<script>
+  // El mensaje viene dentro del enlace (después de #), codificado en base64 URL-safe.
+  // No se envía a ningún servidor.
+  function leer() {
+    try {
+      var h = location.hash.slice(1);
+      if (!h) return null;
+      var b = h.replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      var bin = atob(b), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    } catch (e) { return null; }
+  }
+  var m = leer();
+  if (!m || !m.t) {
+    document.getElementById('cuerpo').innerHTML = '<p>No se encontró el mensaje. Abre el enlace desde el correo más reciente.</p>';
+  } else {
+    document.getElementById('tag').textContent = m.e || '';
+    document.getElementById('t').textContent = m.t;
+  }
+  function listo() {
+    document.getElementById('ok').textContent = 'Mensaje copiado. Ya puedes pegarlo en el Canal.';
+    document.getElementById('b').textContent = 'Copiado ✓';
+  }
+  function manual() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('t'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    document.getElementById('ok').textContent = 'Texto seleccionado: cópialo con Ctrl+C (o mantén presionado en el celular).';
+  }
+  function respaldo(t) {
+    var a = document.createElement('textarea');
+    a.value = t; a.setAttribute('readonly', ''); a.style.position = 'fixed'; a.style.top = '0'; a.style.opacity = '0';
+    document.body.appendChild(a); a.focus(); a.select(); a.setSelectionRange(0, t.length);
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    a.remove(); ok ? listo() : manual();
+  }
+  var btn = document.getElementById('b');
+  if (btn) btn.addEventListener('click', function () {
+    var t = m.t;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(t).then(listo, function () { respaldo(t); });
+    } else { respaldo(t); }
+  });
+</script>
+</body>
+</html>
